@@ -1,0 +1,7 @@
+FROM cloudflare/cloudflared:latest
+
+WORKDIR /etc/cloudflared
+COPY ./config.yml ./config.yml
+COPY ./credentials.json ./credentials.json
+
+CMD ["tunnel", "--config", "/etc/cloudflared/config.yml", "run"]

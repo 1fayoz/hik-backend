@@ -1,15 +1,22 @@
-version: '3'
+version: "3.8"
 
 services:
   web:
     build: .
-    container_name: my_django_app
+    container_name: hik_app
     ports:
-      - "8000:8000"
-    command: python manage.py runserver 0.0.0.0:8000
+      - "8004:8004"
+    command: uvicorn main:app --reload --host 0.0.0.0 --port 8004
+    restart: unless-stopped
 
-  tunnel:
+  cloudflared:
     image: cloudflare/cloudflared:latest
-    command: tunnel --url http://web:8000
+    container_name: cloudflared
+    command: tunnel --no-autoupdate run --token ${TUNNEL_TOKEN}
+    restart: unless-stopped
     depends_on:
       - web
+    # volumes:
+    #   - ./cloudflared:/home/nonroot/.cloudflared
+    environment:
+      - TUNNEL_TOKEN=${TUNNEL_TOKEN}
