@@ -1,0 +1,13 @@
+fastapi[standard]~=0.120.0
+sqlalchemy[asyncio]
+asyncpg
+pydantic
+pydantic-settings~=2.11.0
+aiosmtplib
+aiofiles
+gunicorn
+aiohttp
+aiogram~=3.22.0
+black
+starlette~=0.48.0
+python-dotenv~=1.2.1

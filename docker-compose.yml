@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+  web:
+    build: .
+    container_name: my_django_app
+    ports:
+      - "8000:8000"
+    command: python manage.py runserver 0.0.0.0:8000
+
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    command: tunnel --url http://web:8000
+    depends_on:
+      - web
