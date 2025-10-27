@@ -12,11 +12,7 @@ services:
   cloudflared:
     image: cloudflare/cloudflared:latest
     container_name: cloudflared
-    command: tunnel --no-autoupdate run --token ${TUNNEL_TOKEN}
+    command: tunnel --no-autoupdate run --token eyJhIjoiYTZiNjllYzU4N2QzNTdiYWFiYmM4YTY3ZWM5Njk0OGQiLCJ0IjoiMTA4NTVkNWYtZjJhNC00ZDMxLWFjYzQtNzI1Y2M2NTVhYWNkIiwicyI6Ik4yWXhNVGN4T1dFdFpqWTFNUzAwWm1SbExUa3hPRFF0WmpJek9HRTJZV1JoWm1WaiJ9
     restart: unless-stopped
     depends_on:
       - web
-    # volumes:
-    #   - ./cloudflared:/home/nonroot/.cloudflared
-    environment:
-      - TUNNEL_TOKEN=${TUNNEL_TOKEN}
