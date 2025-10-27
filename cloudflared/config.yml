@@ -1,7 +1,0 @@
-tunnel: imbdev
-credentials-file: /etc/cloudflared/imbdev.json
-
-ingress:
-  - hostname: salom.imbdev.uz
-    service: http://web:8000
-  - service: http_status:404
