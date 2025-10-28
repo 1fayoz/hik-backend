@@ -12,16 +12,16 @@ router = APIRouter(
 )
 
 
-@router.post("/common")
-async def create_worker(
+# @router.post("/common")
+# async def create_worker(
         # schema: CommonSchema,
         # service: ConnectorService = Depends(ConnectorService)
-):
+# ):
     # auth = None
     # if schema.username and schema.password:
     #     auth = aiohttp.BasicAuth(schema.username, schema.password)
 
-    return "zoq"
+    # return "zoq"
     # return await service.send_request(
     #     method=schema.method,
     #     domain=schema.domain,
