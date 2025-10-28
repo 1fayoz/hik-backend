@@ -78,7 +78,8 @@ class ConnectorService:
             data = response.json()
         except Exception:
             data = response.text
+
         return {
-            "status": data.status_code,
+            "status": response.status_code,
             "response": data
         }
