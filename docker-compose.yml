@@ -3,6 +3,7 @@ version: "3.8"
 services:
   web:
     build: .
+    image: 1fayozz/hik_app:latest
     container_name: hik_app
     ports:
       - "8004:8004"
