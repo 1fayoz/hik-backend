@@ -8,6 +8,8 @@ services:
       - "8004:8004"
     command: uvicorn main:app --reload --host 0.0.0.0 --port 8004
     restart: unless-stopped
+    env_file:
+      - .env
 
   cloudflared:
     image: cloudflare/cloudflared:latest
@@ -18,3 +20,11 @@ services:
       - web
     env_file:
       - .env
+
+  watchtower:
+    image: containrrr/watchtower:latest
+    container_name: watchtower
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --interval 30 hik_app
