@@ -2,6 +2,7 @@ import json
 from typing import Dict, Any
 
 import aiohttp
+import httpx
 from fastapi import UploadFile
 
 
@@ -13,20 +14,22 @@ class ConnectorService:
             domain: str,
             url: str,
             payload: Dict[str, Any],
-            auth: aiohttp.BasicAuth,
+            auth:  httpx.DigestAuth,
             headers: Dict[str, str] | None = None,
     ) -> Dict[str, Any]:
         url = f"http://{domain}/{url}"
 
-        async with aiohttp.ClientSession() as session:
-            async with session.request(
-                    method=method.upper(),
-                    url=url,
-                    json=payload,
-                    headers=headers,
-                    auth=auth
-            ) as resp:
-                return await self._handle_response(resp)
+        async with httpx.AsyncClient() as client:
+            response = await client.request(
+                method=method.upper(),
+                url=url,
+                json=payload,
+                headers=headers,
+                auth=auth,
+                timeout=30.0
+            )
+
+        return await self._handle_response(response)
 
     async def send_face_request(
             self,
@@ -70,12 +73,12 @@ class ConnectorService:
                 return await self._handle_response(resp)
 
     @staticmethod
-    async def _handle_response(resp: aiohttp.ClientResponse) -> Dict[str, Any]:
+    async def _handle_response(response: httpx.Response) -> Dict[str, Any]:
         try:
-            body = await resp.json()
+            data = response.json()
         except Exception:
-            body = await resp.text()
+            data = response.text
         return {
-            "status": resp.status,
-            "response": body
+            "status": data.status_code,
+            "response": data
         }

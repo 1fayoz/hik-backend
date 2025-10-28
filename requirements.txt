@@ -11,3 +11,4 @@ aiogram~=3.22.0
 black
 starlette~=0.48.0
 python-dotenv~=1.2.1
+httpx

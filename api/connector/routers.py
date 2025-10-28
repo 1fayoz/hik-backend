@@ -1,4 +1,5 @@
 import json
+import httpx
 
 import aiohttp
 from fastapi import APIRouter, Depends, HTTPException
@@ -19,7 +20,7 @@ async def create_worker(
 ):
     auth = None
     if schema.username and schema.password:
-        auth = aiohttp.BasicAuth(schema.username, schema.password)
+        auth = httpx.DigestAuth(schema.username, schema.password)
 
     return await service.send_request(
         method=schema.method,
