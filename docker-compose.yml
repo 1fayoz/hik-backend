@@ -1,12 +1,15 @@
+version: "3.8"
+
 services:
   web:
-    image: 1fayozz/hik_app:latest
+    build: .
     container_name: hik_app
     ports:
       - "8004:8004"
+    command: uvicorn main:app --reload --host 0.0.0.0 --port 8004
+    restart: unless-stopped
     env_file:
       - .env
-    restart: unless-stopped
 
   cloudflared:
     image: cloudflare/cloudflared:latest
