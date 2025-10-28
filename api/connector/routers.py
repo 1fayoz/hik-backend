@@ -12,23 +12,23 @@ router = APIRouter(
     tags=["Worker"]
 )
 
-
-@router.post("/common")
-async def create_worker(
-        schema: CommonSchema,
-        service: ConnectorService = Depends(ConnectorService)
-):
-    auth = None
-    if schema.username and schema.password:
-        auth = httpx.DigestAuth(schema.username, schema.password)
-
-    return await service.send_request(
-        method=schema.method,
-        domain=schema.domain,
-        url=schema.url,
-        payload=schema.payload,
-        auth=auth
-    )
+#
+# @router.post("/common")
+# async def create_worker(
+#         schema: CommonSchema,
+#         service: ConnectorService = Depends(ConnectorService)
+# ):
+#     auth = None
+#     if schema.username and schema.password:
+#         auth = httpx.DigestAuth(schema.username, schema.password)
+#
+#     return await service.send_request(
+#         method=schema.method,
+#         domain=schema.domain,
+#         url=schema.url,
+#         payload=schema.payload,
+#         auth=auth
+#     )
 
 
 @router.post("/add-face")
