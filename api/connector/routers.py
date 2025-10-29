@@ -1,60 +1,38 @@
-import json
-import httpx
+from fastapi import APIRouter, Depends
 
-import aiohttp
-from fastapi import APIRouter, Depends, HTTPException
-
-from .schemas import CommonSchema, AddFaceSchema
-from .services import ConnectorService
+from . import schemas
+from . import services
 
 router = APIRouter(
-    prefix="/connector",
+    prefix="/tunnel",
     tags=["Worker"]
 )
 
 
-@router.post("/common")
-async def create_worker(
-        schema: CommonSchema,
-        service: ConnectorService = Depends(ConnectorService)
-):
-    auth = None
-    if schema.username and schema.password:
-        auth = httpx.DigestAuth(schema.username, schema.password)
 
+@router.post("/")
+async def create_worker(
+    schema: schemas.CommonSchema,
+    service: services.ConnectorService = Depends(services.ConnectorService)
+):
     return await service.send_request(
         method=schema.method,
+        scheme=schema.scheme,
         domain=schema.domain,
-        url=schema.url,
+        port=schema.port,
+        path=schema.url,
+        params=schema.params,
         payload=schema.payload,
-        auth=auth
+        files=schema.files,
+        headers=schema.headers,
+        accept=schema.accept,
+        content_type=schema.content_type,
+        auth_type=schema.auth_type,
+        username=schema.username,
+        password=schema.password,
+        timeout=schema.timeout,
+        retries=schema.retries,
+        verify_ssl=schema.verify_ssl,
+        follow_redirects=schema.follow_redirects,
+        response_mode=schema.response_mode,
     )
-
-
-@router.post("/add-face")
-async def create_worker(
-        schema: AddFaceSchema.as_form,
-        service: ConnectorService = Depends(ConnectorService)
-):
-    try:
-        payload_dict = json.loads(schema.payload)
-    except json.JSONDecodeError:
-        raise HTTPException(status_code=400, detail="Invalid payload JSON format")
-
-    file = {schema.image_key: schema.image}
-    if not file:
-        raise HTTPException(status_code=400, detail="Invalid payload JSON format")
-
-    auth = None
-    if schema.username and schema.password:
-        auth = aiohttp.BasicAuth(schema.username, schema.password)
-
-    return await service.send_face_request(
-        method=schema.method,
-        domain=schema.domain,
-        url=schema.url,
-        payload=payload_dict,
-        file=file,
-        auth=auth
-    )
-
