@@ -115,9 +115,19 @@ class ConnectorService:
             "payload": payload,
         }
 
+        if "files" in kwargs:
+            files = kwargs.pop("files")
+            base["sent_files"] = [
+                {"field_name": f[0], "filename": getattr(f[1], 0, None) or "unknown"}
+                for f in files
+            ]
+
         try:
-            return {**base, "response": response.json(), "content_type": ctype, **kwargs}
+            data = response.json()
         except Exception:
-            return {**base, "response": response.text, "content_type": ctype, **kwargs}
+            data = response.text
+
+        return {**base, "response": data, "content_type": ctype, **kwargs}
+
 
 
