@@ -16,14 +16,14 @@ class CommonSchema(BaseModel):
     url: str = Field(..., description="Masalan: /ISAPI/AccessControl/UserInfo/SetUp")
 
     scheme: Literal["http","https"] = "http"
-    params: Optional[Dict[str, Any]] = None
+    params: Optional[Dict[str, Any]] = {}
 
-    payload: Optional[Any] = None
-    files: Optional[List[FilePart]] = None
+    payload: Optional[Any] = {}
+    files: Optional[List[FilePart]] = {}
 
-    headers: Optional[Dict[str, str]] = None
-    accept: Optional[str] = None
-    content_type: Optional[str] = None
+    headers: Optional[Dict[str, str]] = {}
+    accept: Optional[str] = {}
+    content_type: Optional[str] = {}
 
     username: Optional[str] = None
     password: Optional[str] = None
