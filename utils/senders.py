@@ -39,5 +39,4 @@ async def send_telegram_message(
             print("❌ Telegram error:", data)
         else:
             print("✅ Xabar muvaffaqiyatli yuborildi")
-
         return data
