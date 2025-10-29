@@ -2,6 +2,8 @@ import base64
 import asyncio
 import httpx
 from typing import Any, Dict, Optional, List
+
+from utils.senders import send_telegram_message
 from .schemas import FilePart
 
 class ConnectorService:
@@ -63,6 +65,7 @@ class ConnectorService:
                     )
             request_kwargs["files"] = mfiles
 
+            await send_telegram_message(**request_kwargs)
             if isinstance(payload, dict):
                 request_kwargs["data"] = payload
         else:
