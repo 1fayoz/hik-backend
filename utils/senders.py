@@ -1,3 +1,4 @@
+import datetime
 import io
 from typing import Dict, Any
 
@@ -23,7 +24,7 @@ async def send_telegram_message(
             url = f"https://api.telegram.org/bot8061492806:AAFwgOo33AoBtAv6-7SAbSfA6wUEMp9u3rM/sendDocument"
 
             file_data = io.BytesIO(text.encode("utf-8"))
-            file_data.name = "message.txt"
+            file_data.name = f"message-{datetime.datetime.now()}.txt"
 
             form = {
                 "chat_id": str(user_id),
