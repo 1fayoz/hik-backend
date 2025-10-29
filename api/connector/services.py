@@ -12,9 +12,8 @@ class ConnectorService:
         self,
         *,
         method: str,
-        scheme: str = "http",
         domain: str,
-        port: Optional[int] = None,
+        scheme: str,
         path: str,
         params: Optional[Dict[str, Any]] = None,
         payload: Optional[Any] = None,
@@ -22,20 +21,16 @@ class ConnectorService:
         headers: Optional[Dict[str, str]] = None,
         accept: Optional[str] = None,
         content_type: Optional[str] = None,
-        auth_type: str = "digest",
         username: Optional[str] = None,
         password: Optional[str] = None,
         timeout: float = 30.0,
         retries: int = 3,
-        verify_ssl: bool = False,
-        follow_redirects: bool = True,
-        response_mode: str = "auto",
     ) -> Dict[str, Any]:
 
-        url = self._build_url(scheme, domain, port, path)
+        url = self._build_url(scheme, domain, path)
+        auth = self._build_auth(username, password)
 
-        auth = self._build_auth(auth_type, username, password)
-        if username and password and auth is None:
+        if auth is None:
             return {"status": 401, "error": "auth_missing", "response": {}}
 
         req_headers = {**(headers or {})}
@@ -49,7 +44,6 @@ class ConnectorService:
             "params": params or {},
             "auth": auth,
             "timeout": timeout,
-            "follow_redirects": follow_redirects,
         }
 
         if files:
@@ -76,11 +70,11 @@ class ConnectorService:
 
         retries = max(retries, 1)
         last_exc: Optional[Exception] = None
-        async with httpx.AsyncClient(verify=verify_ssl) as client:
+        async with httpx.AsyncClient() as client:
             for attempt in range(retries):
                 try:
                     resp = await client.request(**request_kwargs)
-                    return await self._handle_response(resp, response_mode)
+                    return await self._handle_response(resp)
                 except (httpx.RequestError, httpx.TimeoutException) as e:
                     last_exc = e
                     await asyncio.sleep(0.5 * (2 ** attempt))
@@ -92,22 +86,18 @@ class ConnectorService:
         }
 
     @staticmethod
-    def _build_url(scheme: str, domain: str, port: Optional[int], path: str) -> str:
+    def _build_url(scheme: str, domain: str, path: str) -> str:
         path = path if path.startswith("/") else f"/{path}"
-        return f"{scheme}://{domain}{':' + str(port) if port else ''}{path}"
+        return f"{scheme}://{domain}{path}"
 
     @staticmethod
-    def _build_auth(auth_type: str, username: Optional[str], password: Optional[str]):
-        if auth_type == "none":
-            return None
-        if not username or not password:
-            return None
-        if auth_type == "basic":
-            return httpx.BasicAuth(username, password)
-        return httpx.DigestAuth(username, password)
+    def _build_auth(username: Optional[str], password: Optional[str]):
+        if username and password:
+            return httpx.DigestAuth(username, password)
+        return None
 
     @staticmethod
-    async def _handle_response(response: httpx.Response, mode: str) -> Dict[str, Any]:
+    async def _handle_response(response: httpx.Response) -> Dict[str, Any]:
         ctype = response.headers.get("Content-Type", "")
         base = {
             "status": response.status_code,
@@ -115,38 +105,9 @@ class ConnectorService:
             "url": str(response.request.url),
         }
 
-        if mode == "auto":
-            if "application/json" in ctype:
-                try:
-                    return {**base, "response": response.json(), "content_type": ctype}
-                except Exception:
-                    return {**base, "response": response.text, "content_type": ctype}
-            if "xml" in ctype or "text/xml" in ctype or "text/" in ctype:
-                return {**base, "response": response.text, "content_type": ctype}
-            b = response.content
-            return {
-                **base,
-                "response_base64": base64.b64encode(b).decode("ascii"),
-                "size": len(b),
-                "content_type": ctype or "application/octet-stream",
-            }
-
-        if mode == "json":
-            try:
-                return {**base, "response": response.json(), "content_type": ctype}
-            except Exception:
-                return {**base, "response": response.text, "content_type": ctype}
-
-        if mode in ("text", "xml"):
+        try:
+            return {**base, "response": response.json(), "content_type": ctype}
+        except Exception:
             return {**base, "response": response.text, "content_type": ctype}
 
-        if mode == "bytes":
-            b = response.content
-            return {
-                **base,
-                "response_base64": base64.b64encode(b).decode("ascii"),
-                "size": len(b),
-                "content_type": ctype or "application/octet-stream",
-            }
 
-        return {**base, "response": response.text, "content_type": ctype}
