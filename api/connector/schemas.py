@@ -16,7 +16,6 @@ class CommonSchema(BaseModel):
     url: str = Field(..., description="Masalan: /ISAPI/AccessControl/UserInfo/SetUp")
 
     scheme: Literal["http","https"] = "http"
-    port: Optional[int] = None
     params: Optional[Dict[str, Any]] = None
 
     payload: Optional[Any] = None
@@ -28,11 +27,6 @@ class CommonSchema(BaseModel):
 
     username: Optional[str] = None
     password: Optional[str] = None
-    auth_type: AuthType = "digest"
 
     timeout: float = 30.0
     retries: int = 3
-    verify_ssl: bool = False
-    follow_redirects: bool = True
-
-    response_mode: ResponseMode = "auto"
