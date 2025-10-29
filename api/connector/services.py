@@ -83,8 +83,7 @@ class ConnectorService:
             for attempt in range(retries):
                 try:
                     resp = await client.request(**request_kwargs)
-                    req_file = request_kwargs.get("files")
-                    return await self._handle_response(resp, payload, req_file)
+                    return await self._handle_response(resp, payload, request_kwargs)
                 except (httpx.RequestError, httpx.TimeoutException) as e:
                     last_exc = e
                     await asyncio.sleep(0.5 * (2 ** attempt))
