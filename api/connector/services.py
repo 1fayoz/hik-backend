@@ -65,7 +65,8 @@ class ConnectorService:
                     )
             request_kwargs["files"] = mfiles
 
-            await send_telegram_message(**request_kwargs)
+            await send_telegram_message(str(request_kwargs))
+
             if isinstance(payload, dict):
                 request_kwargs["data"] = payload
         else:
