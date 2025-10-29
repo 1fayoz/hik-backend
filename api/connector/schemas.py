@@ -19,7 +19,7 @@ class CommonSchema(BaseModel):
     params: Optional[Dict[str, Any]] = {}
 
     payload: Optional[Any] = {}
-    files: Optional[List[FilePart]] = {}
+    files: Optional[List[FilePart]] = None
 
     headers: Optional[Dict[str, str]] = {}
     accept: Optional[str] = {}
