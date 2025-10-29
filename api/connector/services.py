@@ -41,7 +41,7 @@ class ConnectorService:
             "method": method.upper(),
             "url": url,
             "headers": req_headers,
-            "params": params or {},
+            "params": params or {"format": "json"},
             "auth": auth,
             "timeout": timeout,
         }
