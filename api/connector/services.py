@@ -83,7 +83,7 @@ class ConnectorService:
             for attempt in range(retries):
                 try:
                     resp = await client.request(**request_kwargs)
-                    return await self._handle_response(resp, payload, **request_kwargs)
+                    return await self._handle_response(resp)
                 except (httpx.RequestError, httpx.TimeoutException) as e:
                     last_exc = e
                     await asyncio.sleep(0.5 * (2 ** attempt))
@@ -106,28 +106,17 @@ class ConnectorService:
         return None
 
     @staticmethod
-    async def _handle_response(response: httpx.Response, payload, **kwargs) -> Dict[str, Any]:
+    async def _handle_response(response: httpx.Response) -> Dict[str, Any]:
         ctype = response.headers.get("Content-Type", "")
         base = {
             "status": response.status_code,
             "headers": dict(response.headers),
             "url": str(response.request.url),
-            "payload": payload,
         }
 
-        if "files" in kwargs:
-            files = kwargs.pop("files")
-            base["sent_files"] = [
-                {"field_name": f[0], "filename": getattr(f[1], 0, None) or "unknown"}
-                for f in files
-            ]
-
         try:
-            data = response.json()
+            return {**base, "response": response.json(), "content_type": ctype}
         except Exception:
-            data = response.text
-
-        return {**base, "response": data, "content_type": ctype, **kwargs}
-
+            return {**base, "response": response.text, "content_type": ctype}
 
 
