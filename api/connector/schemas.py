@@ -6,7 +6,7 @@ ResponseMode = Literal["auto", "json", "text", "xml", "bytes"]
 
 class FilePart(BaseModel):
     field_name: str = Field(..., description="multipart maydon nomi, masalan 'img' yoki 'faceURL'")
-    filename: str
+    filename: Optional[str] = None
     content_type: str = "application/octet-stream"
     content_base64: str = Field(..., description="Fayl baytlarining base64 ko‘rinishi")
 
