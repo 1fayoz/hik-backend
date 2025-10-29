@@ -49,24 +49,33 @@ class ConnectorService:
         if files:
             mfiles = []
             for f in files:
-                mfiles.append(
-                    (f.field_name,
-                     (f.filename, base64.b64decode(f.content_base64), f.content_type))
-                )
+                raw = base64.b64decode(f.content_base64)
+                ctype = (f.content_type or "application/octet-stream")
+                ctype = ctype.split(";")[0].strip()
+
+                if f.filename is None:
+                    mfiles.append(
+                        (f.field_name, (None, raw, ctype))
+                    )
+                else:
+                    mfiles.append(
+                        (f.field_name, (f.filename, raw, ctype))
+                    )
             request_kwargs["files"] = mfiles
+
             if isinstance(payload, dict):
                 request_kwargs["data"] = payload
         else:
             if isinstance(payload, (dict, list)):
-                request_kwargs["json"] = payload
                 req_headers.setdefault("Content-Type", "application/json")
                 req_headers.setdefault("Accept", req_headers.get("Accept", "application/json"))
+                request_kwargs["json"] = payload
             elif payload is not None:
-                request_kwargs["content"] = payload
                 if content_type:
-                    req_headers["Content-Type"] = content_type
+                    req_headers["Content-Type"] = content_type.split(";")[0].strip()
                 else:
                     req_headers.setdefault("Content-Type", "text/plain")
+                request_kwargs["content"] = payload
 
         retries = max(retries, 1)
         last_exc: Optional[Exception] = None
