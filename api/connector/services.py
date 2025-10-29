@@ -116,8 +116,8 @@ class ConnectorService:
         }
 
         try:
-            return {**base, "response": response.json(), "content_type": ctype}
+            return {**base, "response": response.json(), "content_type": ctype, **kwargs}
         except Exception:
-            return {**base, "response": response.text, "content_type": ctype}
+            return {**base, "response": response.text, "content_type": ctype, **kwargs}
 
 
