@@ -381,3 +381,4 @@ Temporary Items
 celerybeat-schedule.db
 
 *.sql
+__pycache__/
