@@ -16,3 +16,5 @@ git add .
 git push
 
 cd  hik-backend
+
+sudo docker ps
