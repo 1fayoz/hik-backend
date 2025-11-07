@@ -11,4 +11,5 @@ CLOUDFLARE_TOKEN=CLOUDFLARE_TOKEN
 docker logs cloudflared
 
 watchtower
+git pull
 
