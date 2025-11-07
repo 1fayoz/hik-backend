@@ -4,8 +4,6 @@ services:
     container_name: cloudflared
     command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TOKEN}
     restart: always
-    depends_on:
-      - web
     env_file:
       - .env
 
